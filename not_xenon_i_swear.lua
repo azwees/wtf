@@ -2929,10 +2929,9 @@ end, "Teleports you to your current waypoint")
 
 local SpawnpointStatus = Misc_Waypoints:Label("Spawnpoint: Default")
 
-Misc_Anonimous:Button("Delete liderboar", function()
+Misc_Anonimous:Button("TEST", function()
     local pl = game.LocalPlayer
-    local plgui = pl.PlayerGui
-    local hud = plgui.HUD.Playerlist
+
     print("hi")
 end, "just print hi in console (f9)")
 
