@@ -252,6 +252,11 @@ for _, player in pairs(Players:GetPlayers()) do
 end
 Players.PlayerAdded:Connect(CreateESP)
 
+ESPToggle:OnChanged(function()
+    ESP_Config.Enabled = ESPToggle.Value
+end)
+
+
 Tabs.Main:AddParagraph({
     Title = "Developer: azwees (discord: twilight_sync)",
     Content = "umm ok? \nhi"
