@@ -183,100 +183,74 @@ NoClipToggle:OnChanged(function()
         end
     end
 end)
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
-local ESP_Enabled = false 
-
-local ESPToggle = Tabs.Playerss:AddToggle("ESPToggle", {
-    Title = "Player ESP + Names", 
-    Default = false
-})
-
-ESPToggle:OnChanged(function()
-    ESP_Enabled = ESPToggle.Value
-end)
+local ESP_Config = {
+    Enabled = true,
+    BoxColor = Color3.fromRGB(255, 0, 0),
+    TextColor = Color3.fromRGB(255, 255, 255),
+    TextSize = 16
+}
 
 local function CreateESP(player)
-    if player == Players.LocalPlayer then return end
+    local Box = Drawing.new("Square")
+    Box.Visible = false
+    Box.Color = ESP_Config.BoxColor
+    Box.Thickness = 1
+    Box.Filled = false
 
-    local function ApplyESP(character)
-        local head = character:WaitForChild("Head", 10)
-        local hum = character:WaitForChild("Humanoid", 10)
-        if not head or not hum then return end
+    local Name = Drawing.new("Text")
+    Name.Visible = false
+    Name.Color = ESP_Config.TextColor
+    Name.Size = ESP_Config.TextSize
+    Name.Center = true
+    Name.Outline = true
 
-        if character:FindFirstChild("ESP_NameTag") then character.ESP_NameTag:Destroy() end
-        if character:FindFirstChild("ESP_Highlight") then character.ESP_Highlight:Destroy() end
+    local function Update()
+        local Connection
+        Connection = RunService.RenderStepped:Connect(function()
+            if ESP_Config.Enabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
+                local RootPart = player.Character.HumanoidRootPart
+                local Position, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
 
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "ESP_Highlight"
-        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-        highlight.FillTransparency = 0.5
-        highlight.Enabled = ESP_Enabled
-        highlight.Parent = character
+                if OnScreen then
+                    -- Рассчитываем размер бокса в зависимости от дистанции
+                    local Scale = 1 / (Position.Z * math.tan(math.rad(Camera.FieldOfView * 0.5)) * 2) * 1000
+                    local Width, Height = 4 * Scale, 5 * Scale
 
-        local bill = Instance.new("BillboardGui")
-        bill.Name = "ESP_NameTag"
-        bill.AlwaysOnTop = true
-        bill.Size = UDim2.new(0, 200, 0, 50)
-        bill.Adornee = head
-        bill.ExtentsOffset = Vector3.new(0, 3, 0)
-        bill.Enabled = ESP_Enabled
-        bill.Parent = character
+                    Box.Size = Vector2.new(Width, Height)
+                    Box.Position = Vector2.new(Position.X - Width / 2, Position.Y - Height / 2)
+                    Box.Visible = true
 
-        local nameLabel = Instance.new("TextLabel", bill)
-        nameLabel.BackgroundTransparency = 1
-        nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
-        nameLabel.Text = player.Name
-        nameLabel.TextColor3 = Color3.new(1, 1, 1)
-        nameLabel.TextStrokeTransparency = 0 
-        nameLabel.TextSize = 14
-        nameLabel.Font = Enum.Font.GothamBold
-
-        local healthLabel = Instance.new("TextLabel", bill)
-        healthLabel.BackgroundTransparency = 1
-        healthLabel.Position = UDim2.new(0, 0, 0.5, 0)
-        healthLabel.Size = UDim2.new(1, 0, 0.5, 0)
-        healthLabel.TextSize = 13
-        healthLabel.Font = Enum.Font.GothamBold
-        healthLabel.TextStrokeTransparency = 0
-
-        local function UpdateHealth()
-            if not hum or not hum.Parent then return end
-            local health = math.floor(hum.Health)
-            local maxHealth = math.floor(hum.MaxHealth)
-            healthLabel.Text = string.format("HP: %d / %d", health, maxHealth)
-            
-            local pct = math.clamp(health / maxHealth, 0, 1)
-            healthLabel.TextColor3 = Color3.fromHSV(pct * 0.3, 1, 1)
-        end
-
-        UpdateHealth()
-        local healthConn = hum.HealthChanged:Connect(UpdateHealth)
-        
-        character.AncestryChanged:Connect(function(_, parent)
-            if not parent then healthConn:Disconnect() end
+                    Name.Position = Vector2.new(Position.X, Position.Y - (Height / 2) - 20)
+                    Name.Text = player.Name .. " [" .. math.floor(player.Character.Humanoid.Health) .. " HP]"
+                    Name.Visible = true
+                else
+                    Box.Visible = false
+                    Name.Visible = false
+                end
+            else
+                Box.Visible = false
+                Name.Visible = false
+                if not player.Parent then
+                    Box:Remove()
+                    Name:Remove()
+                    Connection:Disconnect()
+                end
+            end
         end)
     end
-
-    player.CharacterAdded:Connect(ApplyESP)
-    if player.Character then task.spawn(ApplyESP, player.Character) end
+    coroutine.wrap(Update)()
 end
 
-for _, p in pairs(Players:GetPlayers()) do CreateESP(p) end
+-- Инициализация
+for _, player in pairs(Players:GetPlayers()) do
+    CreateESP(player)
+end
 Players.PlayerAdded:Connect(CreateESP)
-
-RunService.RenderStepped:Connect(function()
-    for _, p in pairs(Players:GetPlayers()) do
-        if p.Character then
-            local hl = p.Character:FindFirstChild("ESP_Highlight")
-            local tag = p.Character:FindFirstChild("ESP_NameTag")
-            if hl then hl.Enabled = ESP_Enabled end
-            if tag then tag.Enabled = ESP_Enabled end
-        end
-    end
-end)
 
 Tabs.Main:AddParagraph({
     Title = "Developer: azwees (discord: twilight_sync)",
