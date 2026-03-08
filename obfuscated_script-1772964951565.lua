@@ -21,11 +21,10 @@ local NoClipEnabled = false
 -----------------------------------------------------------
 
 --(101) bypases maybe--------------------------------------
--- Локальная таблица-замена для Util
 local FakeCache = {
     Speed = 16,
     Jump = 50,
-    SpeedEnabled = true, -- Флаги включения функций
+    SpeedEnabled = true, 
     JumpEnabled = true
 }
 
@@ -33,9 +32,8 @@ local OldNewIndex;
 OldNewIndex = hookmetamethod(game, "__newindex", newcclosure(function(self, Key, Value, ...)
     if not checkcaller() and self:IsA("Humanoid") then
         if Key == "WalkSpeed" then
-            FakeCache.Speed = Value -- Запоминаем, что игра ХОЧЕТ установить
+            FakeCache.Speed = Value 
             if FakeCache.SpeedEnabled then
-                -- Устанавливаем наше значение из слайдера вместо игрового
                 return OldNewIndex(self, Key, FakeCache.Speed, ...) 
             end
         elseif Key == "JumpPower" then
@@ -52,7 +50,7 @@ local OldIndex;
 OldIndex = hookmetamethod(game, "__index", newcclosure(function(self, Key, ...)
     if not checkcaller() and self:IsA("Humanoid") then
         if Key == "WalkSpeed" then
-            return FakeCache.Speed -- Врем игре, что скорость стандартная
+            return FakeCache.Speed 
         elseif Key == "JumpPower" then
             return FakeCache.Jump
         end
@@ -60,7 +58,6 @@ OldIndex = hookmetamethod(game, "__index", newcclosure(function(self, Key, ...)
     return OldIndex(self, Key, ...)
 end))
 
--- Твой старый байпас неймколла
 local OldNamecallTP;
 OldNamecallTP = hookmetamethod(game, '__namecall', newcclosure(function(self, ...)
     local Arguments = {...}
@@ -189,7 +186,6 @@ end)
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
--- Глобальная переменная для состояния (чтобы функции её видели)
 local ESP_Enabled = false 
 
 local ESPToggle = Tabs.Playerss:AddToggle("ESPToggle", {
@@ -197,7 +193,6 @@ local ESPToggle = Tabs.Playerss:AddToggle("ESPToggle", {
     Default = false
 })
 
--- Синхронизируем значение при переключении
 ESPToggle:OnChanged(function()
     ESP_Enabled = ESPToggle.Value
 end)
@@ -206,16 +201,13 @@ local function CreateESP(player)
     if player == Players.LocalPlayer then return end
 
     local function ApplyESP(character)
-        -- Ждем загрузки необходимых частей
         local head = character:WaitForChild("Head", 10)
         local hum = character:WaitForChild("Humanoid", 10)
         if not head or not hum then return end
 
-        -- Удаляем дубликаты
         if character:FindFirstChild("ESP_NameTag") then character.ESP_NameTag:Destroy() end
         if character:FindFirstChild("ESP_Highlight") then character.ESP_Highlight:Destroy() end
 
-        -- 1. Подсветка (Highlight)
         local highlight = Instance.new("Highlight")
         highlight.Name = "ESP_Highlight"
         highlight.FillColor = Color3.fromRGB(255, 0, 0)
@@ -224,7 +216,6 @@ local function CreateESP(player)
         highlight.Enabled = ESP_Enabled
         highlight.Parent = character
 
-        -- 2. Интерфейс (BillboardGui)
         local bill = Instance.new("BillboardGui")
         bill.Name = "ESP_NameTag"
         bill.AlwaysOnTop = true
@@ -273,11 +264,9 @@ local function CreateESP(player)
     if player.Character then task.spawn(ApplyESP, player.Character) end
 end
 
--- Инициализация существующих игроков
 for _, p in pairs(Players:GetPlayers()) do CreateESP(p) end
 Players.PlayerAdded:Connect(CreateESP)
 
--- Цикл обновления состояния (RenderStepped)
 RunService.RenderStepped:Connect(function()
     for _, p in pairs(Players:GetPlayers()) do
         if p.Character then
