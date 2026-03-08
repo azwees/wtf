@@ -183,61 +183,117 @@ NoClipToggle:OnChanged(function()
         end
     end
 end)
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
 
-local ESP_Config = {
-    Enabled = true,
-    BoxColor = Color3.fromRGB(255, 0, 0),
-    TextColor = Color3.fromRGB(255, 255, 255),
-    TextSize = 16
+_G.ESPToggle = Tabs.Playerss:AddToggle("ESPToggle", {
+    Title = "Player ESP Box (!!!VERY LAG!!!)", 
+    Default = false
+})
+
+_G.ESP_SessionID = tick()
+local CurrentSession = _G.ESP_SessionID
+
+if _G.ESP_Objects then
+    for _, obj in pairs(_G.ESP_Objects) do pcall(function() obj:Remove() end) end
+end
+_G.ESP_Objects = {}
+
+_G.ESP_Settings = _G.ESP_Settings or {
+    Enabled = false,
+    BoxColor = Color3.fromRGB(255, 255, 255),
+    TextColor = Color3.fromRGB(255, 255, 255)
 }
 
-local function CreateESP(player)
-    local Box = Drawing.new("Square")
-    Box.Visible = false
-    Box.Color = ESP_Config.BoxColor
-    Box.Thickness = 1
-    Box.Filled = false
+task.spawn(function()
+    while not _G.ESPToggle do task.wait(1) end
+    _G.ESPToggle:OnChanged(function()
+        _G.ESP_Settings.Enabled = _G.ESPToggle.Value
+        print("ESP Enabled: " .. tostring(_G.ESP_Settings.Enabled)) 
+    end)
+end)
 
+local function CreateESP(player)
+    if player == game.Players.LocalPlayer then return end
+
+    local Box = Drawing.new("Square")
     local Name = Drawing.new("Text")
-    Name.Visible = false
-    Name.Color = ESP_Config.TextColor
-    Name.Size = ESP_Config.TextSize
-    Name.Center = true
-    Name.Outline = true
+    local HealthBarOutline = Drawing.new("Square")
+    local HealthBar = Drawing.new("Square")
+    
+    table.insert(_G.ESP_Objects, Box)
+    table.insert(_G.ESP_Objects, Name)
+    table.insert(_G.ESP_Objects, HealthBarOutline)
+    table.insert(_G.ESP_Objects, HealthBar)
 
     local function Update()
         local Connection
-        Connection = RunService.RenderStepped:Connect(function()
-            if ESP_Config.Enabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
-                local RootPart = player.Character.HumanoidRootPart
-                local Position, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
+        Connection = game:GetService("RunService").RenderStepped:Connect(function()
+
+            if _G.ESP_SessionID ~= CurrentSession then
+                Box:Remove(); Name:Remove(); HealthBar:Remove(); HealthBarOutline:Remove()
+                Connection:Disconnect()
+                return
+            end
+
+            local Cam = workspace.CurrentCamera
+            local Char = player.Character
+            
+            if _G.ESP_Settings.Enabled and Char and Char:FindFirstChild("HumanoidRootPart") and Char:FindFirstChild("Humanoid") then
+                local Root = Char.HumanoidRootPart
+                local Hum = Char.Humanoid
+                
+                if Hum.Health <= 0 then
+                    Box.Visible, Name.Visible, HealthBar.Visible, HealthBarOutline.Visible = false, false, false, false
+                    return 
+                end
+
+                local Pos, OnScreen = Cam:WorldToViewportPoint(Root.Position)
 
                 if OnScreen then
-                    -- Рассчитываем размер бокса в зависимости от дистанции
-                    local Scale = 1 / (Position.Z * math.tan(math.rad(Camera.FieldOfView * 0.5)) * 2) * 1000
-                    local Width, Height = 4 * Scale, 5 * Scale
+                    local Distance = (Cam.CFrame.p - Root.Position).Magnitude
+                    local Height = (1 / Distance) * (Cam.ViewportSize.Y) * 4 
+                    local Width = Height / 1.6
+                    
+                    local BoxPos = Vector2.new(Pos.X - Width / 2, Pos.Y - Height / 2)
 
                     Box.Size = Vector2.new(Width, Height)
-                    Box.Position = Vector2.new(Position.X - Width / 2, Position.Y - Height / 2)
+                    Box.Position = BoxPos
+                    Box.Color = _G.ESP_Settings.BoxColor
+                    Box.Thickness = 1
+                    Box.Transparency = 1
                     Box.Visible = true
 
-                    Name.Position = Vector2.new(Position.X, Position.Y - (Height / 2) - 20)
-                    Name.Text = player.Name .. " [" .. math.floor(player.Character.Humanoid.Health) .. " HP]"
+                    local hp = Hum.Health
+                    local hpColor = (hp < 25 and Color3.new(1,0,0)) or (hp < 50 and Color3.new(1,0.6,0)) or Color3.new(0,1,0)
+
+                    Name.Position = Vector2.new(Pos.X, BoxPos.Y - 20)
+                    Name.Text = string.format("%s [%d HP]", player.Name, math.floor(hp))
+                    Name.Color = hpColor
+                    Name.Size = 16
+                    Name.Center = true
+                    Name.Outline = true
                     Name.Visible = true
+
+                    local hpPercent = math.clamp(hp / Hum.MaxHealth, 0, 1)
+                    
+                    HealthBarOutline.Size = Vector2.new(4, Height)
+                    HealthBarOutline.Position = Vector2.new(BoxPos.X - 6, BoxPos.Y)
+                    HealthBarOutline.Color = Color3.new(0,0,0)
+                    HealthBarOutline.Filled = true
+                    HealthBarOutline.Visible = true
+
+                    HealthBar.Size = Vector2.new(2, Height * hpPercent)
+                    HealthBar.Position = Vector2.new(BoxPos.X - 5, BoxPos.Y + (Height - (Height * hpPercent)))
+                    HealthBar.Color = hpColor
+                    HealthBar.Filled = true
+                    HealthBar.Visible = true
                 else
-                    Box.Visible = false
-                    Name.Visible = false
+                    Box.Visible, Name.Visible, HealthBar.Visible, HealthBarOutline.Visible = false, false, false, false
                 end
             else
-                Box.Visible = false
-                Name.Visible = false
+                Box.Visible, Name.Visible, HealthBar.Visible, HealthBarOutline.Visible = false, false, false, false
+                
                 if not player.Parent then
-                    Box:Remove()
-                    Name:Remove()
+                    Box:Remove(); Name:Remove(); HealthBar:Remove(); HealthBarOutline:Remove()
                     Connection:Disconnect()
                 end
             end
@@ -246,15 +302,8 @@ local function CreateESP(player)
     coroutine.wrap(Update)()
 end
 
--- Инициализация
-for _, player in pairs(Players:GetPlayers()) do
-    CreateESP(player)
-end
-Players.PlayerAdded:Connect(CreateESP)
-
-ESPToggle:OnChanged(function()
-    ESP_Config.Enabled = ESPToggle.Value
-end)
+for _, p in pairs(game.Players:GetPlayers()) do CreateESP(p) end
+game.Players.PlayerAdded:Connect(CreateESP)
 
 
 Tabs.Main:AddParagraph({
