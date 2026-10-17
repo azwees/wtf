@@ -1393,32 +1393,17 @@ Util:AddValues{
         ChosenItemsToSell = {};
         ParsedQuests = {};
         AllMods = {"UzuKee", "BLOODTARO", "Dxscape", "Myst_Ari", "eurycIea", "v_cks", "ezguap", "Tsuzutou", "ReferToWithered", "Illus0", "Pyreiz", "VoidedFlame", "ROUXABOUT", "mixeriiiiiing", "MichDrajo", "hayst4", "ElmoNYC", "Core_CorruptionF", "Brillcake", "AxionTheRevenant", "sammyj0n", "ViveLesPatat", "Zimvasion", "vertiify", "redfoxP", "cakesucker05", "00kamiMio", "itscanii", "SirDeviloper", "0nkka", "Ramdharam", "Olliebutheskenny", "cswag_code", "TwoGio", "KoleRTX2", "Wilpuri", "remendyy", "SpaceNuggies", "CrimsonBeheIit", "warycoolio"};
-        AllItems = {"Christmas Present", "Green Candy", "Blue Candy", "Yellow Candy", "Red Candy", "Mysterious Arrow", "Pure Rokakaka", "Rokakaka", "Diamond", "Lucky Arrow", "Lucky Stone Mask", "Dio's Diary", "Steel Ball", "Rib Cage of The Saint's Corpse", "Stone Mask", "Gold Coin", "Quinton's Glove", "Ancient Scroll"};
+        AllItems = {"Christmas Present", "Green Candy", "Blue Candy", "Yellow Candy", "Red Candy", "Mysterious Arrow", "Pure Rokakaka", "Rokakaka", "Caesar's Headband", "Diamond", "Lucky Arrow", "Lucky Stone Mask", "Dio's Diary", "Steel Ball", "Rib Cage of The Saint's Corpse", "Stone Mask", "Gold Coin", "Quinton's Glove", "Ancient Scroll"};
         AllStands = {"Whitesnake", "Stone Free", "Star Platinum", "The World", "Crazy Diamond", "Killer Queen", "Gold Experience", "King Crimson", "Silver Chariot", "Hermit Purple", "The Hand", "Purple Haze", "Cream", "Hierophant Green", "Magician's Red", "White Album", "Aerosmith", "Six Pistols", "Beach Boy", "Mr. President", "Sticky Fingers", "Anubis", "Red Hot Chili Pepper", "Scary Monsters", "The World Alternate Universe", "D4C", "Tusk ACT 1", "Soft & Wet"};
         AllShinys = {
-            "Action-Figure Platinum",
-            "Actually Red Hot Chili Pepper",
-            "Aerosmith Over Heaven",
-            "All-Starsnake",
-            "Anti-Umbral",
-            "Asuna",
-            "Biblically Accurate Experience",
             "Blade Of The Exile",
-            "Casull",
-            "Charmy Green",
-            "Chromo",
-            "Comic Venom",
             "Cracked World",
-            "Crazy Ruby",
-            "Crazy Idol",
-            "Creeper Queen",
+            "Crazy Idol",	
             "D4She",
             "Devil4c",
             "Deimos Queen",
             "Deimos Snake",
-            "Eldritch Hierophant",
             "Elizabeth Liones",
-            "Elucidator & Dark Repulser",
             "Emperor",
             "Emperor OVA",
             "Female The Hand",
@@ -1433,52 +1418,13 @@ Util:AddValues{
             "Tentacle Black",
             "Tentacle Purple",
             "Tentacle Yellow",
-            "Holly's Sickness",
-            "Jade Peace",
             "Jaguar Platinum",
             "Kanshou & Bakuya",
             "Kikoku",
-            "Killer Reveal",
-            "King of The End",
-            "Linked Sword",
-            "Luffy Gear 4",
-            "Magellan",
-            "Magician's Red: Over Heaven",
-            "Manga Crimson",
             "Megumin",
-            "Mintsnake",
-            "Misaka Mikoto",
-            "Mr. Joestar",
-            "Ms. Aerosmith",
             "Neon Ascension",
-            "Neo World",
-            "Nerf Jolt",
-            "Nocturne",
-            "Nonosama Bo",
-            "ODM Gear",
-            "OVA Silver Chariot",
-            "Old President",
-            "Pinky Fingers",
-            "Queen Crimson",
-            "Rock Unleashed",
-            "Sakura",
-            "Shadow Killer Queen",
-            "Shadow The World",
-            "Sorcerer's Ember",
-            "Spider-Man",
-            "Sasageyo",
-            "Star Platinum OVA",
-            "Star Striped Eagle",
-            "Star Waifu",
-            "Stone Platinum",
-            "The Other Hand",
             "The Waifu v2",
             "The Waifu: Alternate Universe",
-            "The World: Greatest High",
-            "The World 2",
-            "The World OVA",
-            "The World Ultimate",
-            "Toy Sticky Fingers",
             "Tsunade",
             "Uber Spy",
             "Whisper",
@@ -1498,7 +1444,15 @@ Util:AddValues{
             "Dead Experience",
             "Undead Hand",
             "Undead Flare",
-            "Bloodthirster"
+            "Bloodthirster",
+			"Hollow Ace",
+			"The Doorman",
+			"Helsing's Crossbow",
+			"Autumn Vines",
+			"Gummy Worm",
+			"Smelter Chariot",
+			"O5 Keycard",
+			"Pillage & Plunder",
         };
         AllTeleports = {
             ["Newbie Giorno"] = CFrame.new(1, 0, -697);
@@ -2438,7 +2392,7 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
             if Util:GetState("Waiting") == false then --// They haven't been notified before?
                 Library:Notification("You have the shiny you wanted!", Util:CheckShiny(), 3)
                 if not Util:GetState("Disable CRS Logs") then
-                    Util:SendWebhook("https://discord.com/api/webhooks/1304617375441621052/ksMyL_2STFjriIDOwOzuT2lAI2xZh0RaLpFWZBYm1vgxiP6QddOToEQXIDsu2hOD_oLn", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
+                    Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                     Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                 else
                     Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
@@ -2482,7 +2436,7 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
 					if Util:CheckShiny() ~= "None" and Util:CheckShiny() ~= "nil" then
                         Library:Notification("You have an unwanted shiny!", Util:CheckShiny(), 3)
                         if not Util:GetState("Disable CRS Logs") then
-                            Util:SendWebhook("https://discord.com/api/webhooks/1304617265018437712/UhvnuNToj9vC-Vm4asrbEA3cGvL-_tHRP4gJjxw3-0Z2rGxJuknuPUUS9gLdEwmg7xA5", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
+                            Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
                             Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
                         else
                             Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
@@ -2550,7 +2504,7 @@ Autofarms_ShinyFarm:Toggle("Rib Shiny Farm", false, function(State)
             if Util:GetState("Waiting") == false then --// They haven't been notified before?
                     Library:Notification("You have the shiny you wanted!", Util:CheckShiny(), 3)
                     if not Util:GetState("Disable CRS Logs") then
-                        Util:SendWebhook("https://discord.com/api/webhooks/1074691311774478356/-772fIlHuUanYoJsLD2AnQFvmHRKJEbZl8zaDpVEJeRGVFuOZGT-pQf9O4yhQ8MchZq2", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
+                        Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                         Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                     else
                         Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
