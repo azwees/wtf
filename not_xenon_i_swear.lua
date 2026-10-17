@@ -725,7 +725,7 @@ function CRS.Utils:CheckShiny()
     local Character = self:GetCharacter()
     if not Character:FindFirstChild("RemoteFunction") then Character:WaitForChild("RemoteFunction") end
     if Character and Character:FindFirstChild("RemoteFunction") then
-	--print(Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand"))
+	print(Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand"))
         return Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand")
     else 
         return
