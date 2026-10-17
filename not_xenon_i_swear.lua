@@ -2373,17 +2373,16 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
 
         if Util:FindTable("ShinyToggles", Util:CheckShiny()) then
 			local _cur = Util:CheckShiny()
+			local _t = Util.Tables["ShinyToggles"].Value
 			print("=== DEBUG SHINY ===")
-			print("CheckShiny:", type(_cur), "[" .. tostring(_cur) .. "]")
-			print("HasShiny:", Util:HasShiny())
+			print("CheckShiny raw:", string.format("%q", tostring(_cur)))
+			print("CheckShiny len:", type(_cur) == "string" and #_cur or "n/a")
 			print("FindTable:", tostring(Util:FindTable("ShinyToggles", _cur)))
-			local _t = Util.Tables and Util.Tables["ShinyToggles"] and Util.Tables["ShinyToggles"].Value
-			if _t then
-			    for i, v in ipairs(_t) do
-			        print("  toggle["..i.."]:", type(v), "[" .. tostring(v) .. "]")
+			for i, v in ipairs(_t) do
+			    if type(v) == "string" and (v:find("Linked") or i <= 3) then
+			        print(("toggle[%d] raw: %s | len=%d | match=%s"):format(
+			            i, string.format("%q", v), #v, tostring(v == _cur)))
 			    end
-			else
-			    print("!! ShinyToggles.Value is nil, структура другая:", Util.Tables and Util.Tables["ShinyToggles"])
 			end
 			print("===================")
             for _, Instance in Util:GetPlayer().PlayerGui.HUD.Main.Frames.Stands.ScrollingFrame:GetChildren() do
