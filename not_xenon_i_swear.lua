@@ -2351,6 +2351,19 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
     end
     print("starting shinyfarm loop..")
     while Util:GetState("Shiny Farming") == true do task.wait(0.1)
+		local _cur = Util:CheckShiny()
+		local _t = Util.Tables["ShinyToggles"].Value
+		print("=== DEBUG SHINY ===")
+		print("CheckShiny raw:", string.format("%q", tostring(_cur)))
+		print("CheckShiny len:", type(_cur) == "string" and #_cur or "n/a")
+		print("FindTable:", tostring(Util:FindTable("ShinyToggles", _cur)))
+		for i, v in ipairs(_t) do
+			if type(v) == "string" and (v:find("Linked") or i <= 3) then
+			    print(("toggle[%d] raw: %s | len=%d | match=%s"):format(
+			         i, string.format("%q", v), #v, tostring(v == _cur)))
+			end
+		end
+		print("===================")
         warn("Waiting state:", Util:GetState("Waiting"))
         warn("Has Stand:", Util:HasStand())
         --print("Pity:", Util:GetPlayer().PlayerStats.Pity.Value == 0)
@@ -2372,19 +2385,6 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
         end
 
         if Util:FindTable("ShinyToggles", Util:CheckShiny()) then
-			local _cur = Util:CheckShiny()
-			local _t = Util.Tables["ShinyToggles"].Value
-			print("=== DEBUG SHINY ===")
-			print("CheckShiny raw:", string.format("%q", tostring(_cur)))
-			print("CheckShiny len:", type(_cur) == "string" and #_cur or "n/a")
-			print("FindTable:", tostring(Util:FindTable("ShinyToggles", _cur)))
-			for i, v in ipairs(_t) do
-			    if type(v) == "string" and (v:find("Linked") or i <= 3) then
-			        print(("toggle[%d] raw: %s | len=%d | match=%s"):format(
-			            i, string.format("%q", v), #v, tostring(v == _cur)))
-			    end
-			end
-			print("===================")
             for _, Instance in Util:GetPlayer().PlayerGui.HUD.Main.Frames.Stands.ScrollingFrame:GetChildren() do
                 if Instance:FindFirstChild("TextLabel") then
                     if string.find(Instance.TextLabel.Text, "None") then
