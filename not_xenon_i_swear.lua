@@ -2372,6 +2372,20 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
         end
 
         if Util:FindTable("ShinyToggles", Util:CheckShiny()) then
+			local _cur = Util:CheckShiny()
+			print("=== DEBUG SHINY ===")
+			print("CheckShiny:", type(_cur), "[" .. tostring(_cur) .. "]")
+			print("HasShiny:", Util:HasShiny())
+			print("FindTable:", tostring(Util:FindTable("ShinyToggles", _cur)))
+			local _t = Util.Tables and Util.Tables["ShinyToggles"] and Util.Tables["ShinyToggles"].Value
+			if _t then
+			    for i, v in ipairs(_t) do
+			        print("  toggle["..i.."]:", type(v), "[" .. tostring(v) .. "]")
+			    end
+			else
+			    print("!! ShinyToggles.Value is nil, структура другая:", Util.Tables and Util.Tables["ShinyToggles"])
+			end
+			print("===================")
             for _, Instance in Util:GetPlayer().PlayerGui.HUD.Main.Frames.Stands.ScrollingFrame:GetChildren() do
                 if Instance:FindFirstChild("TextLabel") then
                     if string.find(Instance.TextLabel.Text, "None") then
