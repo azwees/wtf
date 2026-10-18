@@ -235,6 +235,14 @@ function CRS.Utils:RemoveTable(Value, RemovedValue)
 end
 
 function CRS.Utils:FindTable(Value, TableIndex)
+    if Value == "ShinyToggles" then
+        for _, toggle in ipairs(self.Tables[Value].Value) do
+            if type(toggle) == "table" and toggle.Name == TableIndex then
+                return toggle.State 
+            end
+        end
+        return nil
+    end
     return table.find(self.Tables[Value].Value, TableIndex)
 end
 
@@ -2639,14 +2647,99 @@ Autofarms_QuestFarm:Toggle("Quest Farm", false, function(State)
             Util:SetState("CompletedQuest", true)
         end
     end))
-    
+
+    -- Клик по конкретному Option (возвращает true, если получилось нажать)
+    local function clickOption(dialogueGui, optionNumber)
+        local frame = dialogueGui:FindFirstChild("Frame")
+        local options = frame and frame:FindFirstChild("Options")
+        if not options then return false end
+        
+        local option = options:FindFirstChild("Option" .. tostring(optionNumber))
+        if not option then return false end
+        
+        local btn = option:FindFirstChild("TextButton")
+        if btn and btn.Visible then
+            Util:Click(btn, true)
+            return true
+        end
+        return false
+    end
+
+    -- Функция для закрытия диалога, если нет вариантов ответа
+    local function clickClose(dialogueGui)
+        local frame = dialogueGui:FindFirstChild("Frame")
+        if not frame then return false end
+        
+        -- Ищем кнопку ClickContinue (как на твоем скрине)
+        local cont = frame:FindFirstChild("ClickContinue")
+        if cont then
+            -- Внутри может быть TextButton, ImageButton или сам объект может быть кнопкой
+            local btn = cont:FindFirstChildWhichIsA("GuiButton") or (cont:IsA("GuiButton") and cont)
+            if btn and btn.Visible then
+                Util:Click(btn, true)
+                return true
+            end
+        end
+        
+        -- Если ClickContinue нет, пробуем найти любую видимую кнопку в Frame, чтобы закрыть
+        local fallbackBtn = frame:FindFirstChildWhichIsA("TextButton")
+        if fallbackBtn and fallbackBtn.Visible then
+            Util:Click(fallbackBtn, true)
+            return true
+        end
+        
+        return false
+    end
+
+    -- Функция для взаимодействия с NPC квестов
+    local function TriggerQuestNPC()
+        local questName = Util:GetString("Quest")
+        if not questName then return end
+        
+        local npc = workspace:FindFirstChild("Dialogues") and workspace.Dialogues:FindFirstChild(questName)
+        if not npc then return end
+        
+        local prompt = npc:FindFirstChildWhichIsA("ProximityPrompt") or npc:FindFirstChild("ProximityPrompt")
+        if prompt and fireproximityprompt then
+            fireproximityprompt(prompt)
+        elseif prompt then
+            prompt:InputHoldBegin()
+            task.wait(prompt.HoldDuration + 0.1)
+            prompt:InputHoldEnd()
+        else
+            return 
+        end
+        
+        task.wait(0.8) -- Ждем, пока прогрузится GUI
+        
+        -- Пытаемся пройти диалог
+        for i = 1, 3 do
+            local dialogueGui = Util:GetPlayer().PlayerGui:FindFirstChild("DialogueGui")
+            if dialogueGui and dialogueGui:FindFirstChild("Frame") then
+                -- Пытаемся нажать Option1
+                if not clickOption(dialogueGui, 1) then
+                    -- Если Option1 нет (нет вариантов), жмем "Продолжить" чтобы закрыть
+                    print("[QuestFarm] Нет вариантов ответа, закрываем диалог...")
+                    clickClose(dialogueGui)
+                end
+                task.wait(0.6)
+            else
+                break -- Окно закрылось
+            end
+        end
+    end
+
     while Util:GetState("Quest Farm") == true do
         if Util:GetState("CompletedQuest") == true then
-            Util:GetQuest(workspace.Dialogues:FindFirstChild(Util:GetString("Quest")))
+            TriggerQuestNPC() 
+            Util:SetState("CompletedQuest", false) 
         end
-        local EnemyName = Util:GetTable("QuestInfo")[Util:GetString("Quest")]["Enemy"]
-        if EnemyName then
-            for i,v in pairs(workspace.Living:GetChildren()) do
+        
+        local questInfo = Util:GetTable("QuestInfo")[Util:GetString("Quest")]
+        if questInfo then
+            local EnemyName = questInfo.Enemy
+            if EnemyName then
+                for i, v in pairs(workspace.Living:GetChildren()) do
                     if Util:GetPlayer().PlayerStats.QuestProgress.Value >= Util:GetPlayer().PlayerStats.QuestMaxProgress.Value then
                         Util:SetState("CompletedQuest", true)
                         break
@@ -2659,15 +2752,16 @@ Autofarms_QuestFarm:Toggle("Quest Farm", false, function(State)
                             warn("[CRS] Kill function experienced an error; but was handled by CRS -", F)
                         end
                     end
-            end
-        else
-            Util:GetQuest(workspace.Dialogues:FindFirstChild(Util:GetString("Quest")))
-            local Item = Util:GetTable("QuestInfo")[Util:GetString("Quest")].Item
-            local Amount = Util:GetTable("QuestInfo")[Util:GetString("Quest")].Amount
-
-            local CurrentAmount = Util:CountItem(Item)
-            if CurrentAmount < Amount then
-                    for i,v in pairs(workspace.Item_Spawns.Items:GetChildren()) do
+                end
+            else
+                TriggerQuestNPC() 
+                
+                local Item = questInfo.Item
+                local Amount = questInfo.Amount
+                local CurrentAmount = Util:CountItem(Item)
+                
+                if CurrentAmount < Amount then
+                    for i, v in pairs(workspace.Item_Spawns.Items:GetChildren()) do
                         if v.Name == Item then
                             Util:Collect(v)
                         end
@@ -2675,10 +2769,10 @@ Autofarms_QuestFarm:Toggle("Quest Farm", false, function(State)
                             break
                         end
                     end
+                end
             end
-            Util:GetQuest(workspace.Dialogues:FindFirstChild(Util:GetString("Quest")))
         end
-        task.wait()
+        task.wait(0.1) 
     end
 end, "Toggles quest farming")
 
@@ -3358,14 +3452,91 @@ end, "auto sells selected items once")
 
 Misc_Sell:Toggle("Auto Sell", false, function(State)
     Util:SetState("Auto Sell", State)
+    local PlayerGui = Util:GetPlayer():WaitForChild("PlayerGui")
 
-    while Util:GetState("Auto Sell") == true do task.wait()
-        for i,v in pairs(Util:GetTable("ChosenItemsToSell")) do
-			if not Util:GetPlayer().Backpack:FindFirstChild(v) then continue end
+    local function clickOption(optionNumber)
+        local dialogueGui = PlayerGui:FindFirstChild("DialogueGui")
+        if not dialogueGui or not dialogueGui:FindFirstChild("Frame") then return false end
+        
+        local options = dialogueGui.Frame:FindFirstChild("Options")
+        if not options then return false end
+        
+        local option = options:FindFirstChild("Option" .. tostring(optionNumber))
+        if not option then return false end
+        
+        local btn = option:FindFirstChild("TextButton")
+
+        local timeout = tick() + 2
+        while (not btn or not btn.Visible) and tick() < timeout do
+            task.wait(0.1)
+            btn = option:FindFirstChild("TextButton")
+        end
+
+        if btn and btn.Visible then
+            Util:Click(btn, true)
+            return true
+        else
+            return false
+        end
+    end
+
+    while Util:GetState("Auto Sell") == true do task.wait(0.5)
+        for i, v in pairs(Util:GetTable("ChosenItemsToSell")) do
+            local tool = Util:GetPlayer().Backpack:FindFirstChild(v)
+            if not tool then continue end
+
+            Util:GetHumanoid():EquipTool(tool)
+            task.wait(0.3) 
+
+            local dialogueFolder = workspace:FindFirstChild("Dialogues")
+            local merchantNPC = dialogueFolder and dialogueFolder:FindFirstChild("ShiftPlox, The Travelling Merchant")
+            local prompt = merchantNPC and (merchantNPC:FindFirstChildWhichIsA("ProximityPrompt") or merchantNPC:FindFirstChild("ProximityPrompt"))
             
-            Util:GetHumanoid():EquipTool(Util:GetPlayer().Backpack:FindFirstChild(v))
-            Util:GetCharacter().RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option1", Dialogue = "Dialogue5"})
-            task.wait()
+            if prompt then
+                if fireproximityprompt then 
+                    fireproximityprompt(prompt) 
+                else
+                    prompt:InputHoldBegin()
+                    task.wait(prompt.HoldDuration + 0.1)
+                    prompt:InputHoldEnd()
+                end
+            else
+                warn("yo not found")
+            end
+
+            
+            task.wait(0.8) 
+            
+            -- Кликаем строго по твоей схеме: 1 -> 1 -> 6
+            if PlayerGui:FindFirstChild("DialogueGui") then
+                
+                -- Первый клик по Option1
+                clickOption(1)
+                task.wait(0.6) -- Ждем, пока прогрузится следующий текст/меню
+                
+                -- Второй клик по Option1
+                clickOption(1)
+                task.wait(0.6)
+                
+                -- Третий клик по Option6 (Продажа)
+                clickOption(6)
+                
+                -- Ждем, пока окно полностью закроется
+                local closeTimeout = tick() + 2
+                while PlayerGui:FindFirstChild("DialogueGui") and tick() < closeTimeout do
+                    task.wait(0.1)
+                end
+            end
+            
+            -- 4. Ждем фактического исчезновения предмета
+            local timeout = tick() + 3
+            while tick() < timeout do
+                task.wait(0.1)
+                if not Util:GetPlayer().Backpack:FindFirstChild(v) and not Util:GetCharacter():FindFirstChild(v) then
+                    break 
+                end
+            end
+            task.wait(0.3)
         end
     end
 end, "auto sells all selected items")
@@ -3591,6 +3762,11 @@ for i,v in pairs(game.ReplicatedStorage.Anims:GetDescendants()) do
     if v:IsA("Animation") and not Util:FindTable("AnimsBlacklist", v.Name) and v.Parent.Name ~= "Poses" then
         Util:InsertTable("AnimsList", v.Name)
     end
+end
+
+local firstToggle = Util.Tables["ShinyToggles"].Value[1]
+for k, v in pairs(firstToggle) do
+    print("Ключ:", k, "Значение:", v)
 end
 
 for i,v in pairs(game.ReplicatedStorage.Anims.Poses:GetChildren()) do
